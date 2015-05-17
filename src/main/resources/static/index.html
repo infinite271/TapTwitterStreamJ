@@ -27,6 +27,9 @@
                 stompClient.subscribe('/topic/hashtags', function(hashtags){
                     processHashTags(JSON.parse(hashtags.body));
                 });
+                stompClient.subscribe('/topic/keywordHashtags', function(hashtags){
+                    processHashTags(JSON.parse(hashtags.body));
+                });
             });
         }
 

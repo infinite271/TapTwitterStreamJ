@@ -41,8 +41,9 @@ public class TweetController {
         String keywordValues = (String) map.get("filterParameters");
         keywords = keywordValues.split(" ");
 
-        scheduledExecutorService = Executors.newScheduledThreadPool(1);
-        scheduledExecutorService.scheduleWithFixedDelay(this::publishHashTags, 0, 10, TimeUnit.SECONDS);
+        scheduledExecutorService = Executors.newScheduledThreadPool(2);
+        scheduledExecutorService.scheduleWithFixedDelay(this::publishHashTags, 10, 10, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleWithFixedDelay(this::publishKeywordHashTags, 10, 10, TimeUnit.SECONDS);
 
         if (twitterStream != null) {
             log.info("Shutting down listener and cleaning up");
@@ -58,6 +59,22 @@ public class TweetController {
 
     public void publishHashTags() {
         template.convertAndSend("/topic/hashtags", hashtags);
+    }
+
+    public void publishKeywordHashTags(){
+        Map<String, Integer> keywordHashtags = new HashMap<>();
+
+        for(Map.Entry entry : hashtags.entrySet()){
+            for(String keyword : keywords){
+                String key = (String) entry.getKey();
+                log.info("Comparing: " + key + " with: " + "#" + keyword);
+                if(key.equals("#" + keyword)){
+                    keywordHashtags.put(key, (Integer)entry.getValue());
+                }
+            }
+        }
+
+        template.convertAndSend("/topic/keywordHashtags", keywordHashtags);
     }
 
     public void startListening() {
