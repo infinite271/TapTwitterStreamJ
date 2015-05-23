@@ -1,10 +1,9 @@
 package taptwitterstreamj.infrastructure.assemblers.tweet;
 
 import org.springframework.stereotype.Component;
-import taptwitterstreamj.domain.Tweet;
 import twitter4j.Status;
 
-@Component
+@Component("TweetToDomainAssembler")
 public class TweetToDomainAssembler {
 
     public Tweet assemble(Status status) {

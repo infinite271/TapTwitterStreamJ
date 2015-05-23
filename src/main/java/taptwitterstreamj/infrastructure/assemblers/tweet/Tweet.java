@@ -1,11 +1,11 @@
-package taptwitterstreamj.domain;
+package taptwitterstreamj.infrastructure.assemblers.tweet;
 
 import lombok.Data;
 
 @Data
 public class Tweet {
 
-    private final String username;
+    private final String screenName;
     private final String location;
     private final String content;
 
