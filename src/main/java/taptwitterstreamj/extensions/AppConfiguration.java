@@ -1,11 +1,11 @@
-package taptwitterstreamj;
+package taptwitterstreamj.extensions;
 
 import akka.actor.ActorSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import static taptwitterstreamj.SpringExtension.SpringExtProvider;
+import static taptwitterstreamj.extensions.SpringExtension.SpringExtProvider;
 
 /**
  * The application configuration.

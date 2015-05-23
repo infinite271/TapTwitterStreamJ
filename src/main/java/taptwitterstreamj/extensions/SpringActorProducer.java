@@ -1,4 +1,4 @@
-package taptwitterstreamj;
+package taptwitterstreamj.extensions;
 
 import akka.actor.Actor;
 import akka.actor.IndirectActorProducer;

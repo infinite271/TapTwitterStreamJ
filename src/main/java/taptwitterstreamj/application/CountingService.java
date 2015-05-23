@@ -1,6 +1,4 @@
-package taptwitterstreamj;
-
-import org.springframework.stereotype.Component;
+package taptwitterstreamj.application;
 
 import javax.inject.Named;
 

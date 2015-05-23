@@ -2,9 +2,8 @@ package taptwitterstreamj;
 
 import akka.actor.UntypedActor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import taptwitterstreamj.application.CountingService;
 import taptwitterstreamj.infrastructure.MessageSender;
 import taptwitterstreamj.infrastructure.assemblers.tweet.Tweet;
 
