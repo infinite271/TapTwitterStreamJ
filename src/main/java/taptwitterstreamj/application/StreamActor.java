@@ -42,16 +42,15 @@ class StreamActor extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof FilterMessage) {
-            getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
-                    getSender(), new PublishMessage(sessionId, "/topic/hashtags", hashtags), getContext().system().dispatcher(), getSelf());
-            getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
-                    getSender(), new PublishMessage(sessionId, "/topic/keywordHashtags", keywordHashtags), getContext().system().dispatcher(), getSelf());
-
             sender = getSender();
             hashtags = new HashMap<>();
             keywordHashtags = new HashMap<>();
             sessionId = ((FilterMessage) message).getSessionId();
             keywords = ((FilterMessage) message).getKeywords();
+            getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
+                    getSender(), new PublishMessage(sessionId, "/topic/hashtags", hashtags), getContext().system().dispatcher(), getSelf());
+            getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
+                    getSender(), new PublishMessage(sessionId, "/topic/keywordHashtags", keywordHashtags), getContext().system().dispatcher(), getSelf());
             subscribe();
         } else {
             unhandled(message);

@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.inject.Inject;
+
 import static taptwitterstreamj.extensions.SpringExtension.SpringExtProvider;
 
 /**
@@ -14,7 +17,7 @@ import static taptwitterstreamj.extensions.SpringExtension.SpringExtProvider;
 class AppConfiguration {
 
   // the application context is needed to initialize the Akka Spring Extension
-  @Autowired
+  @Inject
   private ApplicationContext applicationContext;
 
   /**

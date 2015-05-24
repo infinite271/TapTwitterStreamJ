@@ -2,13 +2,13 @@ package taptwitterstreamj.infrastructure;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 @Named("MessageSender")
 public class MessageSender {
 
-    @Resource
+    @Inject
     private SimpMessagingTemplate template;
 
     public void sendMessage(String endpoint, Object o){
