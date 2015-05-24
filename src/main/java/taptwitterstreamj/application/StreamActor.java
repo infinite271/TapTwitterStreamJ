@@ -1,6 +1,7 @@
 package taptwitterstreamj.application;
 
 import akka.actor.ActorRef;
+import akka.actor.Cancellable;
 import akka.actor.UntypedActor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +10,15 @@ import scala.concurrent.duration.Duration;
 import taptwitterstreamj.infrastructure.messaging.FilterMessage;
 import taptwitterstreamj.infrastructure.messaging.PublishMessage;
 import taptwitterstreamj.infrastructure.assemblers.tweet.TweetToDomainAssembler;
+import taptwitterstreamj.infrastructure.messaging.ShutdownMessage;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -31,6 +33,8 @@ class StreamActor extends UntypedActor {
     private String[] keywords;
     private String sessionId;
     private ActorRef sender;
+    private Cancellable hashtagJob;
+    private Cancellable keywordHashtagJob;
     private Map<String, Integer> hashtags;
     private Map<String, Integer> keywordHashtags;
 
@@ -43,15 +47,20 @@ class StreamActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof FilterMessage) {
             sender = getSender();
-            hashtags = new HashMap<>();
-            keywordHashtags = new HashMap<>();
+            hashtags = new ConcurrentHashMap<>();
+            keywordHashtags = new ConcurrentHashMap<>();
             sessionId = ((FilterMessage) message).getSessionId();
             keywords = ((FilterMessage) message).getKeywords();
-            getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
-                    getSender(), new PublishMessage(sessionId, "/topic/hashtags", hashtags), getContext().system().dispatcher(), getSelf());
-            getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
-                    getSender(), new PublishMessage(sessionId, "/topic/keywordHashtags", keywordHashtags), getContext().system().dispatcher(), getSelf());
+            hashtagJob = getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
+                    getSender(), new PublishMessage(sessionId, "/topic/hashtags/", hashtags), getContext().system().dispatcher(), getSelf());
+            keywordHashtagJob = getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
+                    getSender(), new PublishMessage(sessionId, "/topic/keywordHashtags/", keywordHashtags), getContext().system().dispatcher(), getSelf());
             subscribe();
+        } else if (message instanceof ShutdownMessage) {
+            hashtagJob.cancel();
+            keywordHashtagJob.cancel();
+            twitterStream.shutdown();
+            context().stop(self());
         } else {
             unhandled(message);
         }
@@ -77,7 +86,7 @@ class StreamActor extends UntypedActor {
             public void onStatus(Status status) {
                 processHashtags(status);
                 processKeywordHashtags();
-                sender.tell(new PublishMessage(sessionId, "/topic/tweets", tweetToDomainAssembler.assemble(status)), getSelf());
+                sender.tell(new PublishMessage(sessionId, "/topic/tweets/", tweetToDomainAssembler.assemble(status)), getSelf());
             }
 
             @Override

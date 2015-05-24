@@ -9,6 +9,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import taptwitterstreamj.infrastructure.messaging.FilterMessage;
+import taptwitterstreamj.infrastructure.messaging.PublishMessage;
+import taptwitterstreamj.infrastructure.messaging.ShutdownMessage;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -47,6 +49,8 @@ public class TweetController {
 
     @MessageMapping("/shutdown")
     public void shutdown(String parameters) throws Exception {
+        actorSystem = context.getBean(ActorSystem.class);
+
         Map<String, Object> map = new ObjectMapper().readValue(parameters, HashMap.class);
         String sessionId = (String) map.get("sessionId");
 
@@ -54,8 +58,9 @@ public class TweetController {
 
         ActorRef streamActor = actorSystem.actorFor("/user/StreamActor-" + sessionId);
         ActorRef publishActor = actorSystem.actorFor("/user/PublishActor-" + sessionId);
-        streamActor.tell(PoisonPill.getInstance(), null);
-        publishActor.tell(PoisonPill.getInstance(), null);
+
+        streamActor.tell(new ShutdownMessage(), null);
+        publishActor.tell(new ShutdownMessage(), null);
     }
 
 }

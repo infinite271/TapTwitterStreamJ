@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>TapTwitterStreamJ</title>
+    <link rel="stylesheet" type="text/css" href="flatTable.css">
     <script src="sockjs-0.3.4.js"></script>
     <script src="stomp.js"></script>
     <script type="text/javascript">
@@ -12,31 +13,29 @@
             document.getElementById('connect').disabled = connected;
             document.getElementById('disconnect').disabled = !connected;
             document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
-            document.getElementById('tweets').innerHTML = '';
-            document.getElementById('hashtags').innerHTML = '';
         }
 
         function connect() {
             var socket = new SockJS('/getTweets');
             stompClient = Stomp.over(socket);
-            stompClient.connect({}, function(frame) {
+            stompClient.connect({}, function (frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/tweets', function(tweet){
+                stompClient.subscribe('/topic/tweets/' + uuid, function (tweet) {
                     processTweet(JSON.parse(tweet.body).content);
                 });
-                stompClient.subscribe('/topic/hashtags', function(hashtags){
+                stompClient.subscribe('/topic/hashtags/' + uuid, function (hashtags) {
                     processHashTags(JSON.parse(hashtags.body));
                 });
-                stompClient.subscribe('/topic/keywordHashtags', function(hashtags){
-                    processHashTags(JSON.parse(hashtags.body));
+                stompClient.subscribe('/topic/keywordHashtags/' + uuid, function (hashtags) {
+                    processKeywordHashtags(JSON.parse(hashtags.body));
                 });
             });
         }
 
         function disconnect() {
             if (stompClient != null) {
-                stompClient.send("/app/shutdown", {}, JSON.stringify({ 'sessionId': uuid }));
+                stompClient.send("/app/shutdown", {}, JSON.stringify({'sessionId': uuid}));
                 stompClient.disconnect();
             }
             setConnected(false);
@@ -49,53 +48,140 @@
                         .toString(16)
                         .substring(1);
             }
+
             return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
         }
 
         function sendFilterParameters() {
             var filterParameters = document.getElementById('filterParameters').value;
-            stompClient.send("/app/getTweets", {}, JSON.stringify({ 'sessionId': uuid, 'filterParameters': filterParameters }));
+            stompClient.send("/app/getTweets", {}, JSON.stringify({
+                'sessionId': uuid,
+                'filterParameters': filterParameters
+            }));
         }
 
         function processTweet(message) {
-            var response = document.getElementById('tweets');
-            var p = document.createElement('p');
-            //p.style.wordWrap = 'break-word';
+
+            var tableRows = document.getElementById("tweetsTable").rows.length;
+
+            if (tableRows >= 10) {
+                var table = document.getElementById("tweetsTable");
+                for (var i = table.rows.length - 1; i > 0; i--) {
+                    table.deleteRow(i);
+                }
+            }
+
             var str = JSON.stringify(message, null, 3);
-            p.appendChild(document.createTextNode(str));
-            response.appendChild(p);
+            var tableRef = document.getElementById('tweetsTable').getElementsByTagName('tbody')[0];
+
+            // Insert a row in the table at the last row
+            var newRow = tableRef.insertRow(tableRef.rows.length);
+
+            // Insert a cell in the row at index 0
+            var newCell = newRow.insertCell(0);
+
+            // Append a text node to the cell
+            var newText = document.createTextNode(str);
+            newCell.appendChild(newText);
+
+        }
+
+        function processKeywordHashtags(message) {
+            var tableRows = document.getElementById("keywordHashtagsTable").rows.length;
+
+            if (tableRows >= 1) {
+                var table = document.getElementById("keywordHashtagsTable");
+                for (var i = table.rows.length - 1; i > 0; i--) {
+                    table.deleteRow(i);
+                }
+            }
+
+            var str = JSON.stringify(message, null, 3);
+            var tableRef = document.getElementById('keywordHashtagsTable').getElementsByTagName('tbody')[0];
+
+            // Insert a row in the table at the last row
+            var newRow = tableRef.insertRow(tableRef.rows.length);
+
+            // Insert a cell in the row at index 0
+            var newCell = newRow.insertCell(0);
+
+            // Append a text node to the cell
+            var newText = document.createTextNode(str);
+            newCell.appendChild(newText);
         }
 
         function processHashTags(message) {
-            var response = document.getElementById('hashtags');
-            var p = document.createElement('p');
-            //p.style.wordWrap = 'break-word';
-            console.log("About to parse: " + message)
+            var tableRows = document.getElementById("hashtagsTable").rows.length;
+
+            if (tableRows >= 1) {
+                var table = document.getElementById("hashtagsTable");
+                for (var i = table.rows.length - 1; i > 0; i--) {
+                    table.deleteRow(i);
+                }
+            }
+
             var str = JSON.stringify(message, null, 3);
-            console.log("Result was: " + str)
-            p.appendChild(document.createTextNode(str));
-            response.appendChild(p);
+            var tableRef = document.getElementById('hashtagsTable').getElementsByTagName('tbody')[0];
+
+            // Insert a row in the table at the last row
+            var newRow = tableRef.insertRow(tableRef.rows.length);
+
+            // Insert a cell in the row at index 0
+            var newCell = newRow.insertCell(0);
+
+            // Append a text node to the cell
+            var newText = document.createTextNode(str);
+            newCell.appendChild(newText);
         }
     </script>
 </head>
 <body onload="disconnect()">
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
     Javascript and reload this page!</h2></noscript>
 <div>
-    <div>
+    <br/>
+    <div class="headerContainer">
+        <h1 align="center">TapTwitterStreamJ</h1>
+    </div>
+    <br/>
+
+    <div align="center">
         <button id="connect" onclick="connect();">Connect</button>
         <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
     </div>
-    <div id="conversationDiv">
-        <label>Filter Tweets by: </label><input type="text" id="filterParameters" value="Poker" />
+    <br/>
+
+    <div id="conversationDiv" class="filterContainer" align="center">
+        <label>Filter Tweets by: </label><input type="text" id="filterParameters" value="Poker"/>
         <button id="sendFilterParameters" onclick="sendFilterParameters();">Filter</button>
     </div>
-    <div>
-        <p id="tweets"></p>
-    </div>
-    <div>
-        <p id="hashtags"></p>
-    </div>
+    <br/>
+    <br/>
+
+    <table id="keywordHashtagsTable" class="flat-table">
+        <tbody>
+        <tr>
+            <th>Keyword Hashtags</th>
+        </tr>
+        </tbody>
+    </table>
+
+    <table id="hashtagsTable" class="flat-table">
+        <tbody>
+        <tr>
+            <th>Hashtags</th>
+        </tr>
+        </tbody>
+    </table>
+
+    <table id="tweetsTable" class="flat-table">
+        <tbody>
+        <tr>
+            <th>Live Tweet Stream</th>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
