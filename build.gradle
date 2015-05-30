@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
-version = '1.0'
+version = '1.0.1'
 
 repositories {
     mavenCentral()
@@ -13,7 +13,26 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        classpath("se.transmode.gradle:gradle-docker:1.2")
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
+    }
+}
+
+group = 'mikechinaloy'
+
+apply plugin: 'docker'
+
+task buildDocker(type: Docker, dependsOn: build){
+    push = false
+    tagVersion = jar.version
+    applicationName = jar.baseName
+    dockerfile = file('src/main/docker/Dockerfile')
+
+    doFirst{
+        copy{
+            from jar
+            into stageDir
+        }
     }
 }
 
@@ -34,23 +53,24 @@ idea {
 }
 
 jar {
-    baseName = 'gs-messaging-stomp-websocket'
-    version =  '0.1.0'
+    baseName = 'taptwitterstreamj'
+    version =  '1.0.1'
 }
 
 dependencies {
     provided("org.projectlombok:lombok:1.16.4")
-    compile("com.typesafe.akka:akka-actor_2.11:2.3.11")
-    compile("org.aspectj:aspectjtools:1.6.10")
-    compile("org.aspectj:aspectjrt:1.6.10")
-    compile("org.springframework:spring-aspects:3.2.2.RELEASE")
+    compile("org.aspectj:aspectjtools:1.8.0")
+    compile("org.aspectj:aspectjrt:1.8.0")
     compile("javax.persistence:persistence-api:1.0")
+    compile("javax.inject:javax.inject:1")
+    compile("org.springframework:spring-aspects:3.2.2.RELEASE")
     compile("org.springframework:spring-tx:3.2.2.RELEASE")
     compile("org.springframework:spring-orm:3.2.2.RELEASE")
-    compile('org.twitter4j:twitter4j-core:4.0.1')
-    compile('org.twitter4j:twitter4j-stream:4.0.3')
     compile("org.springframework.boot:spring-boot-starter-websocket")
     compile("org.springframework:spring-messaging")
-    compile("javax.inject:javax.inject:1")
+    compile("org.twitter4j:twitter4j-core:4.0.1")
+    compile("org.twitter4j:twitter4j-stream:4.0.3")
+    compile("com.typesafe.akka:akka-actor_2.11:2.3.11")
+    testCompile("com.typesafe.akka:akka-testkit_2.10:2.3.11")
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

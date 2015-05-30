@@ -15,7 +15,7 @@ import static taptwitterstreamj.extensions.SpringExtension.SpringExtProvider;
 
 @Named("TweetMaster")
 @Scope("prototype")
-class TweetMaster extends UntypedActor {
+public class TweetMaster extends UntypedActor {
 
     @Inject
     private ApplicationContext context;

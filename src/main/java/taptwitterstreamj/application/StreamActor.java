@@ -7,6 +7,8 @@ import akka.actor.UntypedActor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import scala.concurrent.duration.Duration;
+import taptwitterstreamj.aspects.Log;
+import taptwitterstreamj.domain.Tweet;
 import taptwitterstreamj.infrastructure.messaging.FilterMessage;
 import taptwitterstreamj.infrastructure.messaging.PublishMessage;
 import taptwitterstreamj.infrastructure.assemblers.tweet.TweetToDomainAssembler;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Named("StreamActor")
 @Scope("prototype")
-class StreamActor extends UntypedActor {
+public class StreamActor extends UntypedActor {
 
     private final TweetToDomainAssembler tweetToDomainAssembler;
 
@@ -86,7 +88,9 @@ class StreamActor extends UntypedActor {
             public void onStatus(Status status) {
                 processHashtags(status);
                 processKeywordHashtags();
-                sender.tell(new PublishMessage(sessionId, "/topic/tweets/", tweetToDomainAssembler.assemble(status)), getSelf());
+                Tweet tweet = tweetToDomainAssembler.assemble(status);
+                log.info(String.format("New Tweet received=%s", tweet.toString()));
+                sender.tell(new PublishMessage(sessionId, "/topic/tweets/", tweet), getSelf());
             }
 
             @Override
@@ -117,6 +121,7 @@ class StreamActor extends UntypedActor {
         twitterStream.filter(fq);
     }
 
+    @Log
     private void processHashtags(Status status) {
         for (HashtagEntity hashtagEntity : status.getHashtagEntities()) {
             Integer result = hashtags.computeIfPresent("#" + hashtagEntity.getText(), (k, v) -> v + 1);
@@ -126,6 +131,7 @@ class StreamActor extends UntypedActor {
         }
     }
 
+    @Log
     private void processKeywordHashtags() {
         for (Map.Entry entry : hashtags.entrySet()) {
             for (String keyword : keywords) {

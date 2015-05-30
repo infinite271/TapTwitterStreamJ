@@ -1,4 +1,4 @@
-package taptwitterstreamj.infrastructure.assemblers.tweet;
+package taptwitterstreamj.domain;
 
 import lombok.Data;
 
