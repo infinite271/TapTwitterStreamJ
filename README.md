@@ -2,7 +2,7 @@
 
 Currently hosted on - https://cloud.digitalocean.com/
 <p>
-Deployed using - Docker and Nginx
+Deployed using - Docker
 </p>
 <p>
 Docker URL - https://registry.hub.docker.com/u/mikechinaloy/taptwitterstreamj/tags/manage/
