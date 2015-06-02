@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
 
-version = '1.0.1'
+version = '1.0.2'
 
 repositories {
     mavenCentral()
@@ -54,7 +54,7 @@ idea {
 
 jar {
     baseName = 'taptwitterstreamj'
-    version =  '1.0.1'
+    version =  '1.0.2'
 }
 
 dependencies {

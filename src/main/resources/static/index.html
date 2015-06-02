@@ -133,6 +133,11 @@
             var newText = document.createTextNode(str);
             newCell.appendChild(newText);
         }
+
+        window.onbeforeunload = function(){
+            disconnect()
+        };
+
     </script>
 </head>
 <body onload="disconnect()">
