@@ -9,16 +9,15 @@ import org.springframework.context.annotation.Scope;
 import scala.concurrent.duration.Duration;
 import taptwitterstreamj.aspects.Log;
 import taptwitterstreamj.domain.Tweet;
-import taptwitterstreamj.infrastructure.messaging.FilterMessage;
-import taptwitterstreamj.infrastructure.messaging.PublishMessage;
+import taptwitterstreamj.infrastructure.messaging.*;
 import taptwitterstreamj.infrastructure.assemblers.tweet.TweetToDomainAssembler;
-import taptwitterstreamj.infrastructure.messaging.ShutdownMessage;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -30,15 +29,15 @@ public class StreamActor extends UntypedActor {
 
     private final TweetToDomainAssembler tweetToDomainAssembler;
 
+    private ActorRef tweetMaster;
     private TwitterStream twitterStream;
     private StatusListener statusListener;
     private String[] keywords;
     private String sessionId;
-    private ActorRef sender;
     private Cancellable hashtagJob;
     private Cancellable keywordHashtagJob;
     private Map<String, Integer> hashtags;
-    private Map<String, Integer> keywordHashtags;
+    private Map<String, Integer> keywordStatistics;
 
     @Inject
     public StreamActor(@Named("TweetToDomainAssembler") TweetToDomainAssembler tweetToDomainAssembler) {
@@ -48,16 +47,24 @@ public class StreamActor extends UntypedActor {
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof FilterMessage) {
-            sender = getSender();
+            tweetMaster = getSender();
             hashtags = new ConcurrentHashMap<>();
-            keywordHashtags = new ConcurrentHashMap<>();
+            keywordStatistics = new ConcurrentHashMap<>();
             sessionId = ((FilterMessage) message).getSessionId();
             keywords = ((FilterMessage) message).getKeywords();
             hashtagJob = getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
-                    getSender(), new PublishMessage(sessionId, "/topic/hashtags/", hashtags), getContext().system().dispatcher(), getSelf());
+                    getSelf(), new HashtagMessage(sessionId, "/topic/hashtags/", null), getContext().system().dispatcher(), null);
             keywordHashtagJob = getContext().system().scheduler().schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(10, TimeUnit.SECONDS),
-                    getSender(), new PublishMessage(sessionId, "/topic/keywordHashtags/", keywordHashtags), getContext().system().dispatcher(), getSelf());
+                    getSelf(), new KeywordStatisticMessage(sessionId, "/topic/keywordStatistics/", null), getContext().system().dispatcher(), null);
             subscribe();
+        } else if (message instanceof HashtagMessage) {
+            ((HashtagMessage) message).setMessageContent(deepCopyMap(hashtags));
+            tweetMaster.tell(message, getSelf());
+            hashtags.clear();
+        } else if (message instanceof KeywordStatisticMessage) {
+            ((KeywordStatisticMessage) message).setMessageContent(deepCopyMap(keywordStatistics));
+            tweetMaster.tell(message, getSelf());
+            keywordStatistics.clear();
         } else if (message instanceof ShutdownMessage) {
             hashtagJob.cancel();
             keywordHashtagJob.cancel();
@@ -87,10 +94,10 @@ public class StreamActor extends UntypedActor {
             @Override
             public void onStatus(Status status) {
                 processHashtags(status);
-                processKeywordHashtags();
+                processKeywordStatistics(status.getText());
                 Tweet tweet = tweetToDomainAssembler.assemble(status);
                 log.info(String.format("New Tweet received=%s", tweet.toString()));
-                sender.tell(new PublishMessage(sessionId, "/topic/tweets/", tweet), getSelf());
+                tweetMaster.tell(new TweetMessage(sessionId, "/topic/tweets/", tweet), getSelf());
             }
 
             @Override
@@ -132,14 +139,22 @@ public class StreamActor extends UntypedActor {
     }
 
     @Log
-    private void processKeywordHashtags() {
-        for (Map.Entry entry : hashtags.entrySet()) {
-            for (String keyword : keywords) {
-                String key = (String) entry.getKey();
-                if (key.equals("#" + keyword)) {
-                    keywordHashtags.put(key, (Integer) entry.getValue());
+    private void processKeywordStatistics(String tweetContent) {
+        for (String keyword : keywords) {
+            if (tweetContent.contains(keyword)) {
+                Integer result = keywordStatistics.computeIfPresent(keyword, (k, v) -> v + 1);
+                if (result == null) {
+                    keywordStatistics.put(keyword, 1);
                 }
             }
         }
+    }
+
+    private Map<String, Integer> deepCopyMap(Map<String, Integer> mapToCopy){
+        Map<String, Integer> copy = new HashMap<>();
+        for(Map.Entry<String, Integer> entry : mapToCopy.entrySet()){
+            copy.put(entry.getKey(), entry.getValue());
+        }
+        return copy;
     }
 }

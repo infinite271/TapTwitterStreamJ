@@ -1,12 +1,14 @@
 package taptwitterstreamj.infrastructure.messaging;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-public class PublishMessage {
+@AllArgsConstructor
+public abstract class PublishMessage {
 
     private final String sessionId;
     private final String endpoint;
-    private final Object obj;
+    private Object messageContent;
 
 }

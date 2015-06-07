@@ -2,191 +2,84 @@
 <html>
 <head>
     <title>TapTwitterStreamJ</title>
-    <link rel="stylesheet" type="text/css" href="flatTable.css">
-    <script src="sockjs-0.3.4.js"></script>
-    <script src="stomp.js"></script>
-    <script type="text/javascript">
-        var stompClient = null;
-        var uuid = guid();
-
-        function setConnected(connected) {
-            document.getElementById('connect').disabled = connected;
-            document.getElementById('disconnect').disabled = !connected;
-            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
-        }
-
-        function connect() {
-            var socket = new SockJS('/getTweets');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                setConnected(true);
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/tweets/' + uuid, function (tweet) {
-                    processTweet(JSON.parse(tweet.body).content);
-                });
-                stompClient.subscribe('/topic/hashtags/' + uuid, function (hashtags) {
-                    processHashTags(JSON.parse(hashtags.body));
-                });
-                stompClient.subscribe('/topic/keywordHashtags/' + uuid, function (hashtags) {
-                    processKeywordHashtags(JSON.parse(hashtags.body));
-                });
-            });
-        }
-
-        function disconnect() {
-            if (stompClient != null) {
-                stompClient.send("/app/shutdown", {}, JSON.stringify({'sessionId': uuid}));
-                stompClient.disconnect();
-            }
-            setConnected(false);
-            console.log("Disconnected");
-        }
-
-        function guid() {
-            function s4() {
-                return Math.floor((1 + Math.random()) * 0x10000)
-                        .toString(16)
-                        .substring(1);
-            }
-
-            return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
-        }
-
-        function sendFilterParameters() {
-            var filterParameters = document.getElementById('filterParameters').value;
-            stompClient.send("/app/getTweets", {}, JSON.stringify({
-                'sessionId': uuid,
-                'filterParameters': filterParameters
-            }));
-        }
-
-        function processTweet(message) {
-
-            var tableRows = document.getElementById("tweetsTable").rows.length;
-
-            if (tableRows >= 10) {
-                var table = document.getElementById("tweetsTable");
-                for (var i = table.rows.length - 1; i > 0; i--) {
-                    table.deleteRow(i);
-                }
-            }
-
-            var str = JSON.stringify(message, null, 3);
-            var tableRef = document.getElementById('tweetsTable').getElementsByTagName('tbody')[0];
-
-            // Insert a row in the table at the last row
-            var newRow = tableRef.insertRow(tableRef.rows.length);
-
-            // Insert a cell in the row at index 0
-            var newCell = newRow.insertCell(0);
-
-            // Append a text node to the cell
-            var newText = document.createTextNode(str);
-            newCell.appendChild(newText);
-
-        }
-
-        function processKeywordHashtags(message) {
-            var tableRows = document.getElementById("keywordHashtagsTable").rows.length;
-
-            if (tableRows >= 1) {
-                var table = document.getElementById("keywordHashtagsTable");
-                for (var i = table.rows.length - 1; i > 0; i--) {
-                    table.deleteRow(i);
-                }
-            }
-
-            var str = JSON.stringify(message, null, 3);
-            var tableRef = document.getElementById('keywordHashtagsTable').getElementsByTagName('tbody')[0];
-
-            // Insert a row in the table at the last row
-            var newRow = tableRef.insertRow(tableRef.rows.length);
-
-            // Insert a cell in the row at index 0
-            var newCell = newRow.insertCell(0);
-
-            // Append a text node to the cell
-            var newText = document.createTextNode(str);
-            newCell.appendChild(newText);
-        }
-
-        function processHashTags(message) {
-            var tableRows = document.getElementById("hashtagsTable").rows.length;
-
-            if (tableRows >= 1) {
-                var table = document.getElementById("hashtagsTable");
-                for (var i = table.rows.length - 1; i > 0; i--) {
-                    table.deleteRow(i);
-                }
-            }
-
-            var str = JSON.stringify(message, null, 3);
-            var tableRef = document.getElementById('hashtagsTable').getElementsByTagName('tbody')[0];
-
-            // Insert a row in the table at the last row
-            var newRow = tableRef.insertRow(tableRef.rows.length);
-
-            // Insert a cell in the row at index 0
-            var newCell = newRow.insertCell(0);
-
-            // Append a text node to the cell
-            var newText = document.createTextNode(str);
-            newCell.appendChild(newText);
-        }
-
-        window.onbeforeunload = function(){
-            disconnect()
-        };
-
-    </script>
+    <link rel="stylesheet" href="css/foundation.css">
+    <script src="js/sockjs/sockjs-0.3.4.js"></script>
+    <script src="js/stomp/stomp.js"></script>
+    <script src="js/taptwitterstream/taptwitterstream.js"></script>
+    <script src="js/vendor/modernizr.js"></script>
 </head>
 <body onload="disconnect()">
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
     enabled. Please enable
     Javascript and reload this page!</h2></noscript>
-<div>
-    <br/>
-    <div class="headerContainer">
-        <h1 align="center">TapTwitterStreamJ</h1>
+<div class="row fullWidth">
+    <div class="small-4 large-4 column">
+        <div class="headerContainer">
+            <h1 align="center">TapTwitterStreamJ</h1>
+        </div>
     </div>
-    <br/>
+</div>
 
-    <div align="center">
-        <button id="connect" onclick="connect();">Connect</button>
-        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+<div class="row fullWidth">
+    <div class="large-12 columns">
+        <fieldset>
+            <legend id="fieldsetLegend">Connection Status - Disconnected</legend>
+            <div class="row fullWidth">
+                <div class="small-4 large-4 columns">
+                    <a href="javascript:void(0)" id="connectButton" onclick="connect();" class="button success">Connect</a>
+                    <a href="javascript:void(0)" id="disconnectButton" onclick="disconnect();" class="button alert disabled">Disconnect</a>
+                </div>
+            </div>
+            <div class="row fullWidth">
+                <div class="large-12 columns">
+                    <div class="row collapse">
+                        <div class="small-10 columns">
+                            <input id="filterParameters" type="text" placeholder="Enter Tweet Keywords">
+                        </div>
+                        <div class="small-2 columns">
+                            <a href="javascript:void(0)" onclick="sendFilterParameters();" id="sendFilterParameters"
+                               class="button postfix success disabled">Filter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
     </div>
-    <br/>
+</div>
 
-    <div id="conversationDiv" class="filterContainer" align="center">
-        <label>Filter Tweets by: </label><input type="text" id="filterParameters" value="Poker"/>
-        <button id="sendFilterParameters" onclick="sendFilterParameters();">Filter</button>
+
+<div class="row fullWidth">
+    <div class="large-12 columns">
+        <table id="keywordStatisticsTable" class="flat-table">
+            <tbody>
+            <tr>
+                <th width="1000px">Keyword Statistics</th>
+            </tr>
+            </tbody>
+        </table>
     </div>
-    <br/>
-    <br/>
-
-    <table id="keywordHashtagsTable" class="flat-table">
-        <tbody>
-        <tr>
-            <th>Keyword Hashtags</th>
-        </tr>
-        </tbody>
-    </table>
-
-    <table id="hashtagsTable" class="flat-table">
-        <tbody>
-        <tr>
-            <th>Hashtags</th>
-        </tr>
-        </tbody>
-    </table>
-
-    <table id="tweetsTable" class="flat-table">
-        <tbody>
-        <tr>
-            <th>Live Tweet Stream</th>
-        </tr>
-        </tbody>
-    </table>
+    <div class="large-12 columns">
+        <table id="hashtagsTable" class="flat-table">
+            <tbody>
+            <tr>
+                <th width="1000px">Hashtags</th>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="large-12 columns">
+        <div style="height:300px; overflow: scroll">
+            <table id="tweetsTable" class="flat-table">
+                <tbody>
+                <tr>
+                    <th width="1000px">Live Tweet Stream</th>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>

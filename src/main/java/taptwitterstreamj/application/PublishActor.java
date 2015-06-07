@@ -26,7 +26,7 @@ public class PublishActor extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof PublishMessage) {
             log.info(String.format("Publishing to client=%s", message));
-            messageSender.sendMessage(((PublishMessage) message).getEndpoint() + ((PublishMessage) message).getSessionId(), ((PublishMessage) message).getObj());
+            messageSender.sendMessage(((PublishMessage) message).getEndpoint() + ((PublishMessage) message).getSessionId(), ((PublishMessage) message).getMessageContent());
         } else if (message instanceof ShutdownMessage) {
             context().stop(self());
         } else {
