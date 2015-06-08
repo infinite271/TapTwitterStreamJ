@@ -2,6 +2,9 @@
 
 Currently hosted on - https://cloud.digitalocean.com/
 <p>
+Technologies used - Java 8, Spring Boot, Akka, Foundation JS
+</p>
+<p>
 Deployed using - Docker
 </p>
 <p>
