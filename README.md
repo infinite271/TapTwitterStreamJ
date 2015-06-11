@@ -4,7 +4,7 @@ TapTwitterStreamJ is a tweet streaming application that usies the Twitter Stream
 
 The project is written in Java 8 and attempts to leverage the following frameworks/technologies:
 <p>
-<b>Backend - Akka (for actor model), SpringBoot (Websockets using Stomp)</b>
+<b>Backend - Akka (for actor model), SpringBoot (Websockets using Stomp and AOP)</b>
 </p>
 <p>
 <b>Frontend - Foundation JS (responsive front end)</b>
