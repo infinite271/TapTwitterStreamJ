@@ -1,5 +1,4 @@
 # taptwitterstreamj
-===================
 
 The project is written in Java 8 and attempts to leverage frameworks such as Akka (for actor model), SpringBoot (Websockets using Stomp), Foundation JS (responsive front end) and Docker (application deployment). It is built using Gradle.
 
