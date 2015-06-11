@@ -1,15 +1,19 @@
-# TapTwitterStreamJ
+# taptwitterstreamj
+===================
 
-Currently hosted on - https://cloud.digitalocean.com/
+The project is written in Java 8 and attempts to leverage frameworks such as Akka (for actor model), SpringBoot (Websockets using Stomp), Foundation JS (responsive front end) and Docker (application deployment). It is built using Gradle.
+
+===================
+Run
+===================
+
 <p>
-Technologies used - Java 8, Spring Boot, Akka, Foundation JS
+The application is currently running in the cloud, hosted by the platform Digital Ocean - https://cloud.digitalocean.com/
 </p>
 <p>
-Deployed using - Docker
+It is deployed using Docker and all images can be built by Gradle and then uploaded to the repository -
+https://registry.hub.docker.com/u/mikechinaloy/taptwitterstreamj/tags/manage/
 </p>
 <p>
-Docker URL - https://registry.hub.docker.com/u/mikechinaloy/taptwitterstreamj/tags/manage/
-</p>
-<p>
-URL - http://178.62.41.152:8080/
+The Application - http://178.62.41.152:8080/
 </p>
