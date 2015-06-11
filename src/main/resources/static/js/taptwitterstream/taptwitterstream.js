@@ -1,11 +1,6 @@
 var stompClient = null;
 var uuid = guid();
 
-function setConnected(connected) {
-    //document.getElementById('connect').disabled = connected;
-    //document.getElementById('disconnect').disabled = !connected;
-}
-
 function connect() {
     var socket = new SockJS('/getTweets');
     stompClient = Stomp.over(socket);
