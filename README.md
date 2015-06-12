@@ -33,6 +33,12 @@ It is deployed using Docker and all images can be built by Gradle and then uploa
 https://registry.hub.docker.com/u/mikechinaloy/taptwitterstreamj/tags/manage/
 </p>
 <p>
+To run the application locally just download the image from Docker and then you can run it for example -
+</p>
+<p>
+<b>docker run -d -p 8080:8080 mikechinaloy/taptwitterstreamj:1.0.3</b>
+</o>
+<p>
 <b>Application URL</b>
 </p>
 <p>
