@@ -5,13 +5,7 @@ TapTwitterStreamJ is a tweet streaming application that usies the Twitter Stream
 The project is written in Java 8 and attempts to leverage the following frameworks/technologies:
 <br/>
 <br/>
-<b>Backend</b> - [Akka.io](http://akka.io/), [SpringBoot](http://projects.spring.io/spring-boot/), [Lombok](https://projectlombok.org/)
-<br/>
-<b>Frontend</b> - [FoundationJS](http://foundation.zurb.com/)
-<br/>
-<b>Deployment</b> - [Docker](https://www.docker.com/)
-<br/>
-<b>Build</b> - [Gradle](http://gradle.org/)
+[Akka.io](http://akka.io/) / [SpringBoot](http://projects.spring.io/spring-boot/) / [Lombok](https://projectlombok.org/) / [FoundationJS](http://foundation.zurb.com/) / [Docker](https://www.docker.com/) / [Gradle](http://gradle.org/)
 
 ===================
 Running locally
