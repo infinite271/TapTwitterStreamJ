@@ -20,9 +20,7 @@ Running locally
 <p>
 To run the application locally just install Docker and then enter the following:
 </p>
-<p>
-<b>docker run -d -p 8080:8080 mikechinaloy/taptwitterstreamj:1.0.3</b>
-</o>
+```docker run -d -p 8080:8080 mikechinaloy/taptwitterstreamj:1.0.3``` 
 
 ===================
 Running in the Cloud
