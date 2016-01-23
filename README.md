@@ -15,25 +15,20 @@ The project is written in Java 8 and attempts to leverage the following framewor
 <br/>
 
 ===================
-Run
+Running locally
 ===================
-
-The application is currently running in the cloud, hosted by the platform [Digital Ocean](https://cloud.digitalocean.com/)
 <p>
-It is deployed using Docker and all images can be built by Gradle and then uploaded to the repository
-</p>
-<p>
-https://registry.hub.docker.com/u/mikechinaloy/taptwitterstreamj/tags/manage/
-</p>
-<p>
-To run the application locally just download the image from Docker and then you can run it for example -
+To run the application locally just install Docker and then enter the following:
 </p>
 <p>
 <b>docker run -d -p 8080:8080 mikechinaloy/taptwitterstreamj:1.0.3</b>
 </o>
-<p>
-<b>Application URL</b>
-</p>
-<p>
+
+===================
+Running in the Cloud
+===================
+
+The application is currently running in the cloud, hosted by the platform [Digital Ocean](https://cloud.digitalocean.com/)
+<br/>
+<br/>
 http://178.62.41.152:8080/
-</p>
