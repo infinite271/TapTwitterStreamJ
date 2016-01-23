@@ -22,7 +22,7 @@ To run the application locally just install Docker and then enter the following:
 ```docker run -d -p 8080:8080 mikechinaloy/taptwitterstreamj:1.0.3``` 
 
 ===================
-Running in the Cloud
+Running in the cloud
 ===================
 
 The application is currently running in the cloud, hosted by the platform [Digital Ocean](https://cloud.digitalocean.com/)
