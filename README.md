@@ -3,18 +3,16 @@
 TapTwitterStreamJ is a tweet streaming application that usies the Twitter Stream API to receive tweets. It has a number of features which include the ability filter tweets on specific keywords, aggregate hashtags and keep track of the occurence of keywords.
 
 The project is written in Java 8 and attempts to leverage the following frameworks/technologies:
-<p>
-<b>Backend - Akka (Actors), SpringBoot (Websockets using Stomp and AOP), Lombok</b>
-</p>
-<p>
-<b>Frontend - Foundation JS (Responsive frontend)</b>
-</p>
-<p>
-<b>Deployment - Docker</b>
-</p>
-<p>
-<b>Build - Gradle</b>
-</p>
+<br/>
+<br/>
+<b>Backend</b> - [Akka.io](http://akka.io/), [SpringBoot](http://projects.spring.io/spring-boot/), [Lombok](https://projectlombok.org/)
+<br/>
+<b>Frontend</b> - [FoundationJS](http://foundation.zurb.com/)
+<br/>
+<b>Deployment</b> - [Docker](https://www.docker.com/)
+<br/>
+<b>Build</b> - [Gradle](http://gradle.org/)
+<br/>
 
 ===================
 Run
