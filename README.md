@@ -18,12 +18,7 @@ The project is written in Java 8 and attempts to leverage the following framewor
 Run
 ===================
 
-<p>
-The application is currently running in the cloud, hosted by the platform Digital Ocean
-</p>
-<p>
-https://cloud.digitalocean.com/
-</p>
+The application is currently running in the cloud, hosted by the platform [Digital Ocean](https://cloud.digitalocean.com/)
 <p>
 It is deployed using Docker and all images can be built by Gradle and then uploaded to the repository
 </p>
