@@ -12,7 +12,6 @@ The project is written in Java 8 and attempts to leverage the following framewor
 <b>Deployment</b> - [Docker](https://www.docker.com/)
 <br/>
 <b>Build</b> - [Gradle](http://gradle.org/)
-<br/>
 ===================
 Running locally
 ===================
