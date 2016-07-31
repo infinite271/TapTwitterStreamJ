@@ -1,4 +1,4 @@
-# taptwitterstreamj
+# twitter-stream-java
 
 TapTwitterStreamJ is a tweet streaming application that usies the Twitter Stream API to receive tweets. It has a number of features which include the ability filter tweets on specific keywords, aggregate hashtags and keep track of the occurence of keywords.
 
